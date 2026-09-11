@@ -15,6 +15,7 @@ import {
   projectRegulatoryEvents,
   listIntelligenceEvents,
 } from "./lib/events.js";
+import { researchCommercialBatch } from "./lib/commercial.js";
 import { collectClinicalTrials } from "./collectors/clinicaltrials.js";
 import { collectOpenFda } from "./collectors/openfda.js";
 import { collectSecSubmissions } from "./collectors/sec.js";
@@ -163,7 +164,7 @@ export default {
           openai_configured: Boolean(env.OPENAI_API_KEY),
           scan_password_required: Boolean(env.RADAR_ACCESS_TOKEN),
           sec_user_agent_configured: Boolean(env.SEC_USER_AGENT),
-          stage: "phase-4-regulatory-events",
+          stage: "phase-5-commercial-evidence",
           endpoints: {
             sources: "GET /api/source-registry",
             scans: "GET /api/scan-runs",
@@ -173,6 +174,7 @@ export default {
             collect: "POST /api/collect",
             resolveIdentities: "POST /api/resolve-identities",
             projectEvents: "POST /api/project-events",
+            researchCommercial: "POST /api/research-commercial",
           },
         },
         200,
@@ -361,6 +363,39 @@ export default {
       }
     }
 
+    if (path === "/api/research-commercial" && request.method === "POST") {
+      if (!isAuthorized(request, env)) {
+        return json({ error: "Unauthorized commercial-research request." }, 401, env);
+      }
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+      if (!env.OPENAI_API_KEY) {
+        return json({ error: "OPENAI_API_KEY is not configured." }, 500, env);
+      }
+
+      let body = {};
+      try {
+        body = await request.json();
+      } catch {
+        body = {};
+      }
+
+      try {
+        const result = await researchCommercialBatch(env.DB, env, {
+          batchSize: body?.batchSize || 5,
+        });
+        return json({ ok: true, ...result }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Commercial research failed.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     return json(
       {
         error: "Not found.",
@@ -377,6 +412,7 @@ export default {
           "POST /api/collect",
           "POST /api/resolve-identities",
           "POST /api/project-events",
+          "POST /api/research-commercial",
         ],
       },
       404,
