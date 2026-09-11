@@ -1,16 +1,19 @@
 # Commercial Launch Radar
 
-GitHub-ready repository for the Commercial Launch Radar rebuild.
+GitHub repository for the Commercial Launch Radar v3 rebuild.
 
-## What is in this repo
+## Repository structure
 
 ```text
-commercial-launch-radar/
+LaunchRadar/
 ├── dashboard/
 │   └── index.html
 ├── worker/
 │   ├── src/
-│   │   └── index.js
+│   │   ├── index.js
+│   │   ├── sources.js
+│   │   ├── collectors/
+│   │   └── lib/
 │   ├── migrations/
 │   │   └── 0001_v3_foundation.sql
 │   └── wrangler.toml.example
@@ -28,17 +31,17 @@ commercial-launch-radar/
 
 ## Current state
 
-The **v3 backend foundation** is live in Cloudflare and uses D1 as the shared database.
+The **v3 backend foundation** uses Cloudflare Workers + D1 as the shared data layer across Firefox, Chrome, Safari and Edge.
 
-The v3 source registry and collector architecture are represented in `worker/src/index.js`.
+The modular v3 Worker includes deterministic collector foundations for ClinicalTrials.gov, SEC EDGAR, openFDA / Drugs@FDA, Greenhouse, Lever and Ashby. FDA Tracker, FDA Advisory Committee, company IR/careers and other public-web research sources are explicitly registered for the deep-research layer.
 
-The dashboard in `dashboard/index.html` is the current stable v2 UI and is included so all project code lives in one repository. It still uses the v2 browser-storage architecture. The next UI milestone is to replace it with the D1-backed v3 dashboard with shared cross-browser records and analytics.
+`dashboard/index.html` is a lightweight v3 foundation dashboard that reads health, source-registry, scan-run and observation data from the shared Worker/D1 backend. It is a scaffold, not the final Salesforce-style analytics dashboard. The next UI milestone will add the opportunity table, hiring phases, evidence confidence, change intelligence and charts.
 
 ## v3 design goals
 
-- one shared D1 database across Firefox, Chrome, Safari, and Edge
+- one shared D1 database across modern browsers
 - deterministic collectors for authoritative public sources
-- explicit source registry and source coverage
+- explicit source registry and measurable source coverage
 - dated intelligence events rather than simple booleans
 - commercial hiring phase 0–6
 - opportunity score separate from evidence confidence
@@ -48,7 +51,7 @@ The dashboard in `dashboard/index.html` is the current stable v2 UI and is inclu
 - analytics charts below the scrollable opportunity table
 - historical evaluation / backtesting before final score calibration
 
-See `docs/BUILD-ROADMAP.md` and `docs/INTELLIGENCE-SPEC.md`.
+See `docs/BUILD-ROADMAP.md`, `docs/INTELLIGENCE-SPEC.md`, and `docs/SCORING-V3-ALPHA.md`.
 
 ## Secrets
 
@@ -61,8 +64,12 @@ They belong only in Cloudflare Secrets.
 
 ## D1 data
 
-The live database is not stored in GitHub. GitHub stores only the database schema/migrations.
+The live database is not stored in GitHub. GitHub stores the database schema/migrations, while production records remain in Cloudflare D1.
+
+## Legacy
+
+`legacy/v2-worker.js` is retained only as a rollback/reference copy of the prior Worker architecture.
 
 ## Next build
 
-The next development step is identity resolution + deep-research/evidence logic, followed by the D1-backed v3 dashboard.
+The next development step is canonical company/asset identity resolution plus deep-research/evidence logic, followed by the full D1-backed analytics dashboard.
