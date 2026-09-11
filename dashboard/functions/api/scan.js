@@ -9,11 +9,28 @@ export async function onRequestPost(context) {
       return Response.json({ error: "A scan password is required." }, { status: 400 });
     }
 
-    const payload = {
-      source: body?.source || "clinicaltrials_gov",
-      query: body?.query || "AREA[Phase]PHASE3",
-      pageSize: Math.max(1, Math.min(Number(body?.pageSize) || 10, 100))
-    };
+    const source = body?.source || "clinicaltrials_gov";
+    let payload;
+
+    if (source === "openfda_drugsfda") {
+      payload = {
+        source,
+        days: Math.max(1, Math.min(Number(body?.days) || 90, 365)),
+        limit: Math.max(1, Math.min(Number(body?.limit) || 50, 99)),
+        startDate: body?.startDate || null,
+        endDate: body?.endDate || null,
+        applicationNumber: body?.applicationNumber || null,
+        sponsor: body?.sponsor || null,
+        brandName: body?.brandName || null
+      };
+    } else {
+      payload = {
+        source: "clinicaltrials_gov",
+        query: body?.query || "AREA[Phase]PHASE3",
+        pageSize: Math.max(1, Math.min(Number(body?.pageSize) || 25, 100)),
+        pageToken: body?.pageToken || null
+      };
+    }
 
     const upstream = await fetch(WORKER_BASE + "/api/collect", {
       method: "POST",
