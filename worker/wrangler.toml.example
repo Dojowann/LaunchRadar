@@ -1,0 +1,22 @@
+name = "commercial-launch-radar-v3"
+main = "src/index.js"
+compatibility_date = "2026-09-10"
+
+# Add your existing D1 database ID before renaming this file to wrangler.toml.
+# You can find the database ID in Cloudflare D1.
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "commercial-launch-radar-v3"
+# database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
+# migrations_dir = "migrations"
+
+[vars]
+# SEC_USER_AGENT = "Commercial Launch Radar your-email@example.com"
+# ALLOWED_ORIGIN = "https://your-dashboard-domain.example"
+
+# NEVER place these values here:
+# OPENAI_API_KEY
+# RADAR_ACCESS_TOKEN
+#
+# Keep them as Cloudflare Secrets.
