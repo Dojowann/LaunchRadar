@@ -11,6 +11,10 @@ import {
   resolveObservationIdentities,
   listCanonicalCompanies,
 } from "./lib/identity.js";
+import {
+  projectRegulatoryEvents,
+  listIntelligenceEvents,
+} from "./lib/events.js";
 import { collectClinicalTrials } from "./collectors/clinicaltrials.js";
 import { collectOpenFda } from "./collectors/openfda.js";
 import { collectSecSubmissions } from "./collectors/sec.js";
@@ -70,6 +74,13 @@ async function collectAndPersist(body, env) {
       result.observations
     );
 
+    const identityResolution = await resolveObservationIdentities(env.DB, {
+      limit: 5000,
+    });
+    const regulatoryProjection = await projectRegulatoryEvents(env.DB, {
+      limit: 5000,
+    });
+
     const latestSourceDate =
       result.observations
         .map((x) => x.publishedAt)
@@ -98,6 +109,9 @@ async function collectAndPersist(body, env) {
       nextPageToken: result.nextPageToken || null,
       totalCount: result.totalCount ?? null,
       upstreamUrl: result.upstreamUrl || null,
+      identityResolution,
+      regulatoryProjection,
+      query: result.query || null,
     };
   } catch (error) {
     const message = error?.message || String(error);
@@ -149,14 +163,16 @@ export default {
           openai_configured: Boolean(env.OPENAI_API_KEY),
           scan_password_required: Boolean(env.RADAR_ACCESS_TOKEN),
           sec_user_agent_configured: Boolean(env.SEC_USER_AGENT),
-          stage: "phase-0-to-3",
+          stage: "phase-4-regulatory-events",
           endpoints: {
             sources: "GET /api/source-registry",
             scans: "GET /api/scan-runs",
             observations: "GET /api/observations",
             companies: "GET /api/companies",
+            events: "GET /api/events",
             collect: "POST /api/collect",
             resolveIdentities: "POST /api/resolve-identities",
+            projectEvents: "POST /api/project-events",
           },
         },
         200,
@@ -247,6 +263,29 @@ export default {
       }
     }
 
+    if (path === "/api/events" && request.method === "GET") {
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+      const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 100, 500));
+      const eventType = String(url.searchParams.get("type") || "").trim();
+
+      try {
+        const events = await listIntelligenceEvents(env.DB, {
+          limit,
+          eventType,
+        });
+        return json({ ok: true, events }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Could not read intelligence events.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     if (path === "/api/collect" && request.method === "POST") {
       if (!isAuthorized(request, env)) {
         return json({ error: "Unauthorized scan request." }, 401, env);
@@ -264,9 +303,7 @@ export default {
         return json(result, 200, env);
       } catch (error) {
         return json(
-          {
-            error: error?.message || String(error),
-          },
+          { error: error?.message || String(error) },
           500,
           env
         );
@@ -303,6 +340,27 @@ export default {
       }
     }
 
+    if (path === "/api/project-events" && request.method === "POST") {
+      if (!isAuthorized(request, env)) {
+        return json({ error: "Unauthorized event-projection request." }, 401, env);
+      }
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+
+      try {
+        const result = await projectRegulatoryEvents(env.DB, { limit: 5000 });
+        return json({ ok: true, ...result }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Regulatory event projection failed.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     return json(
       {
         error: "Not found.",
@@ -315,8 +373,10 @@ export default {
           "GET /api/scan-runs",
           "GET /api/observations",
           "GET /api/companies",
+          "GET /api/events",
           "POST /api/collect",
           "POST /api/resolve-identities",
+          "POST /api/project-events",
         ],
       },
       404,
