@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch Radar Scan Test</title>
+<style>
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f3f3;margin:0;color:#181818}.wrap{max-width:720px;margin:70px auto;padding:0 20px}.card{background:white;border:1px solid #d8dde6;border-radius:8px;padding:24px;box-shadow:0 1px 3px #0001}h1{color:#032d60;margin-top:0}.muted{color:#706e6b}.row{display:flex;gap:10px;margin-top:18px}input{flex:1;padding:11px;border:1px solid #c9c7c5;border-radius:5px}.btn{padding:11px 16px;border:1px solid #0176d3;background:#0176d3;color:white;border-radius:5px;font-weight:700;cursor:pointer}.btn:disabled{opacity:.55}.msg{margin-top:18px;padding:12px;border-radius:5px;background:#eef4ff;border:1px solid #aacbff;color:#032d60;white-space:pre-wrap}a{color:#0176d3}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<h1>Launch Radar — first scan test</h1>
+<p class="muted">This test sends the scan request to the same Pages domain first, then securely forwards it to the Worker. Your password is not stored.</p>
+<div class="row"><input id="pw" type="password" placeholder="Scan Market password"><button class="btn" id="go">Run scan</button></div>
+<div class="msg" id="msg">Ready.</div>
+<p><a href="/">← Back to dashboard</a></p>
+</div></div>
+<script>
+const go=document.getElementById('go');const msg=document.getElementById('msg');
+go.onclick=async()=>{const token=document.getElementById('pw').value;if(!token){msg.textContent='Enter your scan password.';return}go.disabled=true;go.textContent='Scanning…';msg.textContent='Running ClinicalTrials.gov test scan…';try{const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,source:'clinicaltrials_gov',query:'AREA[Phase]PHASE3',pageSize:10})});const text=await r.text();let j;try{j=JSON.parse(text)}catch{throw new Error('Non-JSON response: '+text.slice(0,200))}if(!r.ok||j.ok===false)throw new Error(j.error||('HTTP '+r.status));msg.textContent=`Success. Fetched ${j.fetched??0}, inserted ${j.inserted??0}, duplicates ${j.duplicates??0}.\n\nGo back to the dashboard and click Refresh.`}catch(e){msg.textContent='Scan failed: '+e.message}finally{go.disabled=false;go.textContent='Run scan'}};
+</script>
+</body>
+</html>
