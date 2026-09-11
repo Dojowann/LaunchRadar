@@ -7,6 +7,10 @@ import {
   finishSourceCheck,
   persistObservations,
 } from "./lib/db.js";
+import {
+  resolveObservationIdentities,
+  listCanonicalCompanies,
+} from "./lib/identity.js";
 import { collectClinicalTrials } from "./collectors/clinicaltrials.js";
 import { collectOpenFda } from "./collectors/openfda.js";
 import { collectSecSubmissions } from "./collectors/sec.js";
@@ -66,11 +70,12 @@ async function collectAndPersist(body, env) {
       result.observations
     );
 
-    const latestSourceDate = result.observations
-      .map((x) => x.publishedAt)
-      .filter(Boolean)
-      .sort()
-      .at(-1) || null;
+    const latestSourceDate =
+      result.observations
+        .map((x) => x.publishedAt)
+        .filter(Boolean)
+        .sort()
+        .at(-1) || null;
 
     await finishSourceCheck(env.DB, checkId, {
       status: "complete",
@@ -144,12 +149,14 @@ export default {
           openai_configured: Boolean(env.OPENAI_API_KEY),
           scan_password_required: Boolean(env.RADAR_ACCESS_TOKEN),
           sec_user_agent_configured: Boolean(env.SEC_USER_AGENT),
-          stage: "phase-0-to-2",
+          stage: "phase-0-to-3",
           endpoints: {
             sources: "GET /api/source-registry",
             scans: "GET /api/scan-runs",
             observations: "GET /api/observations",
+            companies: "GET /api/companies",
             collect: "POST /api/collect",
+            resolveIdentities: "POST /api/resolve-identities",
           },
         },
         200,
@@ -221,6 +228,25 @@ export default {
       return json({ ok: true, observations: result.results || [] }, 200, env);
     }
 
+    if (path === "/api/companies" && request.method === "GET") {
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+      const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
+
+      try {
+        const companies = await listCanonicalCompanies(env.DB, { limit });
+        return json({ ok: true, companies }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Canonical company identity layer is not ready. Apply migration 0002_identity_resolution.sql first.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     if (path === "/api/collect" && request.method === "POST") {
       if (!isAuthorized(request, env)) {
         return json({ error: "Unauthorized scan request." }, 401, env);
@@ -247,6 +273,36 @@ export default {
       }
     }
 
+    if (path === "/api/resolve-identities" && request.method === "POST") {
+      if (!isAuthorized(request, env)) {
+        return json({ error: "Unauthorized identity-resolution request." }, 401, env);
+      }
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+
+      let body = {};
+      try {
+        body = await request.json();
+      } catch {
+        body = {};
+      }
+
+      try {
+        const result = await resolveObservationIdentities(env.DB, {
+          limit: body?.limit || 500,
+        });
+        return json({ ok: true, ...result }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Identity resolution failed. Confirm migration 0002_identity_resolution.sql has been applied.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     return json(
       {
         error: "Not found.",
@@ -258,7 +314,9 @@ export default {
           "GET /api/source-registry",
           "GET /api/scan-runs",
           "GET /api/observations",
+          "GET /api/companies",
           "POST /api/collect",
+          "POST /api/resolve-identities",
         ],
       },
       404,
