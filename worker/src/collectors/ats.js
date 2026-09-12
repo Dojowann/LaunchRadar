@@ -87,6 +87,7 @@ export async function collectGreenhouse(input = {}) {
     query: { companyName, boardToken },
     observations,
     upstreamUrl: url,
+    completeInventory: true,
   };
 }
 
@@ -141,6 +142,7 @@ export async function collectLever(input = {}) {
     query: { companyName, site, region },
     observations,
     upstreamUrl: url,
+    completeInventory: true,
   };
 }
 
@@ -191,6 +193,7 @@ export async function collectAshby(input = {}) {
     query: { companyName, boardName },
     observations,
     upstreamUrl: url,
+    completeInventory: true,
   };
 }
 
@@ -328,6 +331,7 @@ export async function collectWorkday(input = {}) {
   const boardUrl = `${origin}/${encodeURIComponent(locale)}/${encodeURIComponent(site)}`;
   const pageSize = 20;
   const seen = new Map();
+  let total = null;
 
   let cookie = "";
 
@@ -361,6 +365,8 @@ export async function collectWorkday(input = {}) {
     const postings = Array.isArray(payload?.jobPostings)
       ? payload.jobPostings
       : [];
+
+    if (Number.isFinite(Number(payload?.total))) total = Number(payload.total);
 
     for (const job of postings) {
       const externalPath = String(job?.externalPath || "").trim();
@@ -399,8 +405,6 @@ export async function collectWorkday(input = {}) {
       );
     }
 
-    const total = Number(payload?.total || 0);
-
     if (
       !postings.length ||
       postings.length < pageSize ||
@@ -410,11 +414,16 @@ export async function collectWorkday(input = {}) {
     }
   }
 
+  const observations = [...seen.values()];
+  const completeInventory =
+    total == null ? observations.length < maxJobs : observations.length >= total;
+
   return {
     sourceKey: "workday",
     tier: "A",
-    query: { companyName, origin, tenant, site, locale, maxJobs },
-    observations: [...seen.values()],
+    query: { companyName, origin, tenant, site, locale, maxJobs, total },
+    observations,
     upstreamUrl: endpoint,
+    completeInventory,
   };
 }
