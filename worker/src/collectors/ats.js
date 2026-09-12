@@ -195,3 +195,128 @@ export async function collectAshby(input = {}) {
     upstreamUrl: url,
   };
 }
+
+function cleanOrigin(value) {
+  try {
+    const url = new URL(String(value || "").trim());
+    if (!/^https?:$/.test(url.protocol)) return "";
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return "";
+  }
+}
+
+function workdayPostedDate(value) {
+  const raw = normalizeWhitespace(value);
+  if (!raw) return null;
+
+  const lower = raw.toLowerCase();
+  const base = new Date();
+  base.setUTCHours(0, 0, 0, 0);
+
+  if (lower.includes("today")) return base.toISOString();
+  if (lower.includes("yesterday")) {
+    base.setUTCDate(base.getUTCDate() - 1);
+    return base.toISOString();
+  }
+
+  const days = lower.match(/(\d+)\+?\s+days?\s+ago/);
+  if (days) {
+    base.setUTCDate(base.getUTCDate() - Number(days[1]));
+    return base.toISOString();
+  }
+
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+export async function collectWorkday(input = {}) {
+  const companyName = normalizeWhitespace(input.companyName || "");
+  const origin = cleanOrigin(input.origin || "");
+  const tenant = normalizeWhitespace(input.tenant || "");
+  const site = normalizeWhitespace(input.site || "");
+  const locale = normalizeWhitespace(input.locale || "en-US") || "en-US";
+  const maxJobs = Math.max(20, Math.min(Number(input.maxJobs) || 400, 1000));
+
+  if (!companyName) throw new Error("Workday collector requires companyName.");
+  if (!origin || !tenant || !site) {
+    throw new Error("Workday collector requires origin, tenant and site.");
+  }
+
+  const hostname = new URL(origin).hostname.toLowerCase();
+  if (!hostname.endsWith(".myworkdayjobs.com")) {
+    throw new Error("Workday origin must be a myworkdayjobs.com host.");
+  }
+
+  const endpoint = `${origin}/wday/cxs/${encodeURIComponent(tenant)}/${encodeURIComponent(site)}/jobs`;
+  const pageSize = 20;
+  const seen = new Map();
+
+  for (let offset = 0; offset < maxJobs; offset += pageSize) {
+    const { payload } = await fetchJson(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Commercial-Launch-Radar/3.0",
+      },
+      body: JSON.stringify({
+        appliedFacets: {},
+        limit: pageSize,
+        offset,
+        searchText: "",
+      }),
+    });
+
+    const postings = Array.isArray(payload?.jobPostings) ? payload.jobPostings : [];
+
+    for (const job of postings) {
+      const externalPath = String(job?.externalPath || "").trim();
+      if (!externalPath) continue;
+
+      const path = externalPath.startsWith("/") ? externalPath : `/${externalPath}`;
+      const externalId = path.split("/").filter(Boolean).at(-1) || path;
+      const jobUrl = `${origin}/${encodeURIComponent(locale)}/${encodeURIComponent(site)}${path}`;
+
+      seen.set(
+        externalId,
+        jobObservation({
+          sourceKey: "workday",
+          companyName,
+          externalId,
+          title: job?.title,
+          url: jobUrl,
+          postedAt: workdayPostedDate(job?.postedOn),
+          location: job?.locationsText || null,
+          department: null,
+          description: "",
+          payload: {
+            postedOnRaw: job?.postedOn || null,
+            bulletFields: Array.isArray(job?.bulletFields) ? job.bulletFields : [],
+            workdayTenant: tenant,
+            workdaySite: site,
+            workdayLocale: locale,
+            externalPath: path,
+          },
+        })
+      );
+    }
+
+    const total = Number(payload?.total || 0);
+    if (
+      !postings.length ||
+      postings.length < pageSize ||
+      (total && offset + postings.length >= total)
+    ) {
+      break;
+    }
+  }
+
+  return {
+    sourceKey: "workday",
+    tier: "A",
+    query: { companyName, origin, tenant, site, locale, maxJobs },
+    observations: [...seen.values()],
+    upstreamUrl: endpoint,
+  };
+}
