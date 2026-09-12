@@ -55,6 +55,22 @@ export const SOURCE_DEFINITIONS = {
     mode: "api",
     implemented: true,
   },
+  smartrecruiters: {
+    key: "smartrecruiters",
+    label: "SmartRecruiters Public Posting API",
+    tier: "A",
+    primary: true,
+    mode: "api",
+    implemented: true,
+  },
+  careers_jsonld: {
+    key: "careers_jsonld",
+    label: "Official Careers Structured Data",
+    tier: "A",
+    primary: true,
+    mode: "html",
+    implemented: true,
+  },
   fda_adcom: {
     key: "fda_adcom",
     label: "FDA Advisory Committee Calendar",
@@ -73,7 +89,7 @@ export const SOURCE_DEFINITIONS = {
   },
   company_careers: {
     key: "company_careers",
-    label: "Company Careers",
+    label: "Company Careers Discovery",
     tier: "A",
     primary: true,
     mode: "web_research",
