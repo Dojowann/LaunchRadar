@@ -16,6 +16,7 @@ import {
   listIntelligenceEvents,
 } from "./lib/events.js";
 import { researchCommercialBatch } from "./lib/commercial.js";
+import { scoreOpportunities, listOpportunities } from "./lib/scoring.js";
 import { collectClinicalTrials } from "./collectors/clinicaltrials.js";
 import { collectOpenFda } from "./collectors/openfda.js";
 import { collectSecSubmissions } from "./collectors/sec.js";
@@ -164,17 +165,19 @@ export default {
           openai_configured: Boolean(env.OPENAI_API_KEY),
           scan_password_required: Boolean(env.RADAR_ACCESS_TOKEN),
           sec_user_agent_configured: Boolean(env.SEC_USER_AGENT),
-          stage: "phase-5-commercial-evidence",
+          stage: "phase-6-opportunity-scoring",
           endpoints: {
             sources: "GET /api/source-registry",
             scans: "GET /api/scan-runs",
             observations: "GET /api/observations",
             companies: "GET /api/companies",
             events: "GET /api/events",
+            opportunities: "GET /api/opportunities",
             collect: "POST /api/collect",
             resolveIdentities: "POST /api/resolve-identities",
             projectEvents: "POST /api/project-events",
             researchCommercial: "POST /api/research-commercial",
+            scoreOpportunities: "POST /api/score-opportunities",
           },
         },
         200,
@@ -288,6 +291,25 @@ export default {
       }
     }
 
+    if (path === "/api/opportunities" && request.method === "GET") {
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+      const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
+
+      try {
+        const opportunities = await listOpportunities(env.DB, { limit });
+        return json({ ok: true, opportunities }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Could not read recruiting opportunities.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     if (path === "/api/collect" && request.method === "POST") {
       if (!isAuthorized(request, env)) {
         return json({ error: "Unauthorized scan request." }, 401, env);
@@ -304,11 +326,7 @@ export default {
         const result = await collectAndPersist(body, env);
         return json(result, 200, env);
       } catch (error) {
-        return json(
-          { error: error?.message || String(error) },
-          500,
-          env
-        );
+        return json({ error: error?.message || String(error) }, 500, env);
       }
     }
 
@@ -396,6 +414,36 @@ export default {
       }
     }
 
+    if (path === "/api/score-opportunities" && request.method === "POST") {
+      if (!isAuthorized(request, env)) {
+        return json({ error: "Unauthorized opportunity-scoring request." }, 401, env);
+      }
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+
+      let body = {};
+      try {
+        body = await request.json();
+      } catch {
+        body = {};
+      }
+
+      try {
+        const result = await scoreOpportunities(env.DB, {
+          limit: body?.limit || 500,
+        });
+        return json({ ok: true, ...result }, 200, env);
+      } catch (error) {
+        return json(
+          {
+            error: "Opportunity scoring failed.",
+            detail: error?.message || String(error),
+          },
+          500,
+          env
+        );
+      }
+    }
+
     return json(
       {
         error: "Not found.",
@@ -409,10 +457,12 @@ export default {
           "GET /api/observations",
           "GET /api/companies",
           "GET /api/events",
+          "GET /api/opportunities",
           "POST /api/collect",
           "POST /api/resolve-identities",
           "POST /api/project-events",
           "POST /api/research-commercial",
+          "POST /api/score-opportunities",
         ],
       },
       404,
