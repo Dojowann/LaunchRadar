@@ -47,6 +47,14 @@ export const SOURCE_DEFINITIONS = {
     mode: "api",
     implemented: true,
   },
+  workday: {
+    key: "workday",
+    label: "Workday Public Careers",
+    tier: "A",
+    primary: true,
+    mode: "api",
+    implemented: true,
+  },
   fda_adcom: {
     key: "fda_adcom",
     label: "FDA Advisory Committee Calendar",
