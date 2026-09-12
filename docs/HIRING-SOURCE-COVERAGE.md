@@ -18,7 +18,7 @@ LinkedIn, Indeed, ZipRecruiter, recruiter mirrors, scraped job boards, and gener
 
 ## Coverage behavior
 
-The hiring scan now uses discovery version `coverage-v2-smartrecruiters-jsonld` and is instructed to return every verified supported official hiring source for each company, rather than stopping after the first ATS match.
+The hiring scan uses discovery version `coverage-v2-smartrecruiters-jsonld` and is instructed to return every verified supported official hiring source for each company, rather than stopping after the first ATS match.
 
 For every company selected in a hiring scan, `source_checks` records a `company_careers` coverage check with the current discovery version. Verified provider targets are stored in `source_targets`. Each provider collection receives its own source check, so the database distinguishes:
 
@@ -28,11 +28,17 @@ For every company selected in a hiring scan, `source_checks` records a `company_
 - verified source with current postings,
 - provider collection error.
 
+`GET /api/hiring-coverage` exposes the current per-company coverage state, including verified sources, target count, last discovery time, active U.S. commercial jobs, and a coverage-status label.
+
 ## U.S. recruiting precision
 
 The recruiting product is U.S.-focused. Job postings can be stored as raw observations regardless of geography, but only roles with positive U.S. location evidence are classified as recruiting-relevant commercial jobs. Explicit foreign locations are excluded from hiring events and opportunity scoring.
 
 This prevents global postings such as non-U.S. key account manager or market-access roles from inflating U.S. field-force signals.
+
+## Asset attribution
+
+Company-level hiring is not automatically treated as evidence that every asset is building a field force. Scoring version `v3-alpha-2-asset-attribution` gives full company-level hiring credit only when the asset also has an asset-specific launch/regulatory catalyst. Asset-specific hiring events still receive direct credit. Phase III evidence can support early launch-planning logic, but unrelated company field hiring does not by itself push every pipeline asset into Field Force Build or CONTACT NOW.
 
 ## Duplicate control
 
@@ -63,4 +69,4 @@ A production hiring scan should report, per company:
 - active U.S. commercial jobs,
 - last successful check time.
 
-The dashboard should eventually surface this as a hiring-source coverage matrix so `0 jobs` is never shown without context.
+The backend now exposes this coverage state directly. The remaining UI task is to render it as a dashboard hiring-source coverage matrix so `0 jobs` is never shown without context.
