@@ -12,9 +12,13 @@ export async function onRequestPost(context) {
       );
     }
 
-    const payload = {
-      batchSize: Math.max(1, Math.min(Number(body?.batchSize) || 5, 10)),
-    };
+    // Multisource coverage can touch Workday plus a company careers fallback in
+    // the same Worker invocation. Keep each request to one company so provider
+    // pagination and official-careers discovery stay well below edge subrequest
+    // limits. Repeated Scan Market runs naturally advance through the coverage
+    // queue because the Worker prioritizes companies not yet checked by the
+    // current discovery version.
+    const payload = { batchSize: 1 };
 
     const upstream = await fetch(WORKER_BASE + "/api/scan-hiring", {
       method: "POST",
