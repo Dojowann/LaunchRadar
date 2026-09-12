@@ -17,11 +17,20 @@ import {
 } from "./lib/events.js";
 import { researchCommercialBatch } from "./lib/commercial.js";
 import { scoreOpportunities, listOpportunities } from "./lib/scoring.js";
-import { scanHiringBatch, listJobs } from "./lib/hiring.js";
+import { scanHiringBatch, listJobs, listHiringCoverage } from "./lib/hiring.js";
 import { collectClinicalTrials } from "./collectors/clinicaltrials.js";
 import { collectOpenFda } from "./collectors/openfda.js";
 import { collectSecSubmissions } from "./collectors/sec.js";
-import { collectAshby, collectGreenhouse, collectLever } from "./collectors/ats.js";
+import {
+  collectAshby,
+  collectGreenhouse,
+  collectLever,
+  collectWorkday,
+} from "./collectors/ats.js";
+import {
+  collectCareersJsonLd,
+  collectSmartRecruiters,
+} from "./collectors/hiring_coverage.js";
 
 function normalizePath(pathname) {
   return pathname.replace(/\/+$/, "") || "/";
@@ -41,6 +50,12 @@ async function runCollector(source, body, env) {
       return collectLever(body);
     case "ashby":
       return collectAshby(body);
+    case "workday":
+      return collectWorkday(body);
+    case "smartrecruiters":
+      return collectSmartRecruiters(body);
+    case "careers_jsonld":
+      return collectCareersJsonLd(body);
     default: {
       const def = getSourceDefinition(source);
       if (def && !def.implemented) {
@@ -77,19 +92,10 @@ async function collectAndPersist(body, env) {
       result.observations
     );
 
-    const identityResolution = await resolveObservationIdentities(env.DB, {
-      limit: 5000,
-    });
-    const regulatoryProjection = await projectRegulatoryEvents(env.DB, {
-      limit: 5000,
-    });
-
+    const identityResolution = await resolveObservationIdentities(env.DB, { limit: 5000 });
+    const regulatoryProjection = await projectRegulatoryEvents(env.DB, { limit: 5000 });
     const latestSourceDate =
-      result.observations
-        .map((x) => x.publishedAt)
-        .filter(Boolean)
-        .sort()
-        .at(-1) || null;
+      result.observations.map((x) => x.publishedAt).filter(Boolean).sort().at(-1) || null;
 
     await finishSourceCheck(env.DB, checkId, {
       status: "complete",
@@ -141,10 +147,7 @@ export default {
     const path = normalizePath(url.pathname);
 
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders(env),
-      });
+      return new Response(null, { status: 204, headers: corsHeaders(env) });
     }
 
     if (
@@ -166,7 +169,7 @@ export default {
           openai_configured: Boolean(env.OPENAI_API_KEY),
           scan_password_required: Boolean(env.RADAR_ACCESS_TOKEN),
           sec_user_agent_configured: Boolean(env.SEC_USER_AGENT),
-          stage: "phase-7-hiring-intelligence",
+          stage: "phase-7-hiring-coverage",
           endpoints: {
             sources: "GET /api/source-registry",
             scans: "GET /api/scan-runs",
@@ -175,6 +178,7 @@ export default {
             events: "GET /api/events",
             opportunities: "GET /api/opportunities",
             jobs: "GET /api/jobs",
+            hiringCoverage: "GET /api/hiring-coverage",
             collect: "POST /api/collect",
             resolveIdentities: "POST /api/resolve-identities",
             projectEvents: "POST /api/project-events",
@@ -214,13 +218,8 @@ export default {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 30, 100));
       const result = await env.DB.prepare(
-        `SELECT *
-           FROM scan_runs
-          ORDER BY started_at DESC
-          LIMIT ?`
-      )
-        .bind(limit)
-        .all();
+        `SELECT * FROM scan_runs ORDER BY started_at DESC LIMIT ?`
+      ).bind(limit).all();
       return json({ ok: true, scanRuns: result.results || [] }, 200, env);
     }
 
@@ -228,7 +227,6 @@ export default {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 50, 200));
       const source = url.searchParams.get("source") || "";
-
       const stmt = source
         ? env.DB.prepare(
             `SELECT id, source_key, external_id, observation_type,
@@ -247,7 +245,6 @@ export default {
               ORDER BY observed_at DESC
               LIMIT ?`
           ).bind(limit);
-
       const result = await stmt.all();
       return json({ ok: true, observations: result.results || [] }, 200, env);
     }
@@ -255,19 +252,13 @@ export default {
     if (path === "/api/companies" && request.method === "GET") {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
-
       try {
-        const companies = await listCanonicalCompanies(env.DB, { limit });
-        return json({ ok: true, companies }, 200, env);
+        return json({ ok: true, companies: await listCanonicalCompanies(env.DB, { limit }) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Canonical company identity layer is not ready. Apply migration 0002_identity_resolution.sql first.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({
+          error: "Canonical company identity layer is not ready. Apply migration 0002_identity_resolution.sql first.",
+          detail: error?.message || String(error),
+        }, 500, env);
       }
     }
 
@@ -275,41 +266,21 @@ export default {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 100, 500));
       const eventType = String(url.searchParams.get("type") || "").trim();
-
       try {
-        const events = await listIntelligenceEvents(env.DB, {
-          limit,
-          eventType,
-        });
+        const events = await listIntelligenceEvents(env.DB, { limit, eventType });
         return json({ ok: true, events }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Could not read intelligence events.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Could not read intelligence events.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
     if (path === "/api/opportunities" && request.method === "GET") {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
-
       try {
-        const opportunities = await listOpportunities(env.DB, { limit });
-        return json({ ok: true, opportunities }, 200, env);
+        return json({ ok: true, opportunities: await listOpportunities(env.DB, { limit }) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Could not read recruiting opportunities.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Could not read recruiting opportunities.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
@@ -317,186 +288,88 @@ export default {
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
       const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
       const status = String(url.searchParams.get("status") || "active").trim();
-
       try {
-        const jobs = await listJobs(env.DB, { limit, status });
-        return json({ ok: true, jobs }, 200, env);
+        return json({ ok: true, jobs: await listJobs(env.DB, { limit, status }) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Could not read job inventory.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Could not read job inventory.", detail: error?.message || String(error) }, 500, env);
+      }
+    }
+
+    if (path === "/api/hiring-coverage" && request.method === "GET") {
+      if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
+      const limit = Math.max(1, Math.min(Number(url.searchParams.get("limit")) || 200, 500));
+      try {
+        return json({ ok: true, coverage: await listHiringCoverage(env.DB, { limit }) }, 200, env);
+      } catch (error) {
+        return json({ error: "Could not read hiring-source coverage.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
     if (path === "/api/collect" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized scan request." }, 401, env);
-      }
-
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized scan request." }, 401, env);
       let body;
-      try {
-        body = await request.json();
-      } catch {
-        return json({ error: "Invalid JSON body." }, 400, env);
-      }
-
-      try {
-        const result = await collectAndPersist(body, env);
-        return json(result, 200, env);
-      } catch (error) {
-        return json({ error: error?.message || String(error) }, 500, env);
-      }
+      try { body = await request.json(); } catch { return json({ error: "Invalid JSON body." }, 400, env); }
+      try { return json(await collectAndPersist(body, env), 200, env); }
+      catch (error) { return json({ error: error?.message || String(error) }, 500, env); }
     }
 
     if (path === "/api/resolve-identities" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized identity-resolution request." }, 401, env);
-      }
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized identity-resolution request." }, 401, env);
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
-
       let body = {};
+      try { body = await request.json(); } catch {}
       try {
-        body = await request.json();
-      } catch {
-        body = {};
-      }
-
-      try {
-        const result = await resolveObservationIdentities(env.DB, {
-          limit: body?.limit || 500,
-        });
-        return json({ ok: true, ...result }, 200, env);
+        return json({ ok: true, ...(await resolveObservationIdentities(env.DB, { limit: body?.limit || 500 })) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Identity resolution failed. Confirm migration 0002_identity_resolution.sql has been applied.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({
+          error: "Identity resolution failed. Confirm migration 0002_identity_resolution.sql has been applied.",
+          detail: error?.message || String(error),
+        }, 500, env);
       }
     }
 
     if (path === "/api/project-events" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized event-projection request." }, 401, env);
-      }
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized event-projection request." }, 401, env);
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
-
-      try {
-        const result = await projectRegulatoryEvents(env.DB, { limit: 5000 });
-        return json({ ok: true, ...result }, 200, env);
-      } catch (error) {
-        return json(
-          {
-            error: "Regulatory event projection failed.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
-      }
+      try { return json({ ok: true, ...(await projectRegulatoryEvents(env.DB, { limit: 5000 })) }, 200, env); }
+      catch (error) { return json({ error: "Regulatory event projection failed.", detail: error?.message || String(error) }, 500, env); }
     }
 
     if (path === "/api/research-commercial" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized commercial-research request." }, 401, env);
-      }
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized commercial-research request." }, 401, env);
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
-      if (!env.OPENAI_API_KEY) {
-        return json({ error: "OPENAI_API_KEY is not configured." }, 500, env);
-      }
-
+      if (!env.OPENAI_API_KEY) return json({ error: "OPENAI_API_KEY is not configured." }, 500, env);
       let body = {};
+      try { body = await request.json(); } catch {}
       try {
-        body = await request.json();
-      } catch {
-        body = {};
-      }
-
-      try {
-        const result = await researchCommercialBatch(env.DB, env, {
-          batchSize: body?.batchSize || 5,
-        });
-        return json({ ok: true, ...result }, 200, env);
+        return json({ ok: true, ...(await researchCommercialBatch(env.DB, env, { batchSize: body?.batchSize || 5 })) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Commercial research failed.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Commercial research failed.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
     if (path === "/api/scan-hiring" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized hiring-scan request." }, 401, env);
-      }
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized hiring-scan request." }, 401, env);
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
-      if (!env.OPENAI_API_KEY) {
-        return json({ error: "OPENAI_API_KEY is not configured." }, 500, env);
-      }
-
+      if (!env.OPENAI_API_KEY) return json({ error: "OPENAI_API_KEY is not configured." }, 500, env);
       let body = {};
+      try { body = await request.json(); } catch {}
       try {
-        body = await request.json();
-      } catch {
-        body = {};
-      }
-
-      try {
-        const result = await scanHiringBatch(env.DB, env, {
-          batchSize: body?.batchSize || 5,
-        });
-        return json({ ok: true, ...result }, 200, env);
+        return json({ ok: true, ...(await scanHiringBatch(env.DB, env, { batchSize: body?.batchSize || 5 })) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Hiring scan failed.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Hiring scan failed.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
     if (path === "/api/score-opportunities" && request.method === "POST") {
-      if (!isAuthorized(request, env)) {
-        return json({ error: "Unauthorized opportunity-scoring request." }, 401, env);
-      }
+      if (!isAuthorized(request, env)) return json({ error: "Unauthorized opportunity-scoring request." }, 401, env);
       if (!env.DB) return json({ error: "D1 binding DB is not configured." }, 500, env);
-
       let body = {};
+      try { body = await request.json(); } catch {}
       try {
-        body = await request.json();
-      } catch {
-        body = {};
-      }
-
-      try {
-        const result = await scoreOpportunities(env.DB, {
-          limit: body?.limit || 500,
-        });
-        return json({ ok: true, ...result }, 200, env);
+        return json({ ok: true, ...(await scoreOpportunities(env.DB, { limit: body?.limit || 500 })) }, 200, env);
       } catch (error) {
-        return json(
-          {
-            error: "Opportunity scoring failed.",
-            detail: error?.message || String(error),
-          },
-          500,
-          env
-        );
+        return json({ error: "Opportunity scoring failed.", detail: error?.message || String(error) }, 500, env);
       }
     }
 
@@ -515,6 +388,7 @@ export default {
           "GET /api/events",
           "GET /api/opportunities",
           "GET /api/jobs",
+          "GET /api/hiring-coverage",
           "POST /api/collect",
           "POST /api/resolve-identities",
           "POST /api/project-events",
