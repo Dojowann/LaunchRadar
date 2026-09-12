@@ -68,6 +68,9 @@ export function classifyCommercialRole(title) {
     /market access/,
     /payer/,
     /reimbursement/,
+    /field reimbursement/,
+    /access and reimbursement/,
+    /patient access/,
     /pricing/,
   ];
 
@@ -75,12 +78,21 @@ export function classifyCommercialRole(title) {
     /account executive/,
     /key account manager/,
     /strategic account manager/,
+    /regional account manager/,
+    /hospital account manager/,
+    /clinical account specialist/,
     /territory business manager/,
+    /territory business leader/,
+    /therapeutic business manager/,
     /territory manager/,
+    /area business manager/,
     /sales representative/,
     /specialty sales/,
     /field sales/,
     /sales specialist/,
+    /therapeutic specialist/,
+    /oncology specialist/,
+    /executive sales specialist/,
     /business manager/,
   ];
 
