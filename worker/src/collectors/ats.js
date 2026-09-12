@@ -113,9 +113,7 @@ export async function collectLever(input = {}) {
       externalId: job?.id,
       title: job?.text,
       url: job?.hostedUrl || job?.applyUrl,
-      postedAt: job?.createdAt
-        ? new Date(job.createdAt).toISOString()
-        : null,
+      postedAt: job?.createdAt ? new Date(job.createdAt).toISOString() : null,
       location: job?.categories?.location || null,
       department:
         job?.categories?.department ||
@@ -230,6 +228,81 @@ function workdayPostedDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
+function workdayBrowserHeaders(origin, referer, cookie = "") {
+  const headers = {
+    Accept: "application/json, text/plain, */*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Content-Type": "application/json",
+    Origin: origin,
+    Referer: referer,
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+  };
+
+  if (cookie) headers.Cookie = cookie;
+  return headers;
+}
+
+function cookieHeaderFrom(response) {
+  let values = [];
+
+  if (typeof response?.headers?.getSetCookie === "function") {
+    try {
+      values = response.headers.getSetCookie();
+    } catch {}
+  }
+
+  if (!values.length) {
+    const single = response?.headers?.get?.("set-cookie");
+    if (single) values = [single];
+  }
+
+  return values
+    .map((value) => String(value || "").split(";")[0].trim())
+    .filter(Boolean)
+    .join("; ");
+}
+
+async function fetchWorkdayPage({ endpoint, origin, referer, cookie, offset, pageSize }) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: workdayBrowserHeaders(origin, referer, cookie),
+    redirect: "follow",
+    body: JSON.stringify({
+      appliedFacets: {},
+      limit: pageSize,
+      offset,
+      searchText: "",
+    }),
+  });
+
+  const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+  const text = await response.text();
+
+  if (!response.ok) {
+    throw new Error(
+      `Workday CXS returned HTTP ${response.status}: ${stripHtml(text).slice(0, 240) || "no response body"}`
+    );
+  }
+
+  if (!contentType.includes("json")) {
+    throw new Error(
+      `Workday CXS returned ${contentType || "non-JSON"} instead of JSON: ${stripHtml(text).slice(0, 240) || "empty response"}`
+    );
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(
+      `Workday CXS returned invalid JSON: ${stripHtml(text).slice(0, 240) || "empty response"}`
+    );
+  }
+}
+
 export async function collectWorkday(input = {}) {
   const companyName = normalizeWhitespace(input.companyName || "");
   const origin = cleanOrigin(input.origin || "");
@@ -244,37 +317,59 @@ export async function collectWorkday(input = {}) {
   }
 
   const hostname = new URL(origin).hostname.toLowerCase();
-  if (!hostname.endsWith(".myworkdayjobs.com")) {
-    throw new Error("Workday origin must be a myworkdayjobs.com host.");
+  if (
+    !hostname.endsWith(".myworkdayjobs.com") &&
+    !hostname.endsWith(".myworkdaysite.com")
+  ) {
+    throw new Error("Workday origin must be a myworkdayjobs.com or myworkdaysite.com host.");
   }
 
   const endpoint = `${origin}/wday/cxs/${encodeURIComponent(tenant)}/${encodeURIComponent(site)}/jobs`;
+  const boardUrl = `${origin}/${encodeURIComponent(locale)}/${encodeURIComponent(site)}`;
   const pageSize = 20;
   const seen = new Map();
 
-  for (let offset = 0; offset < maxJobs; offset += pageSize) {
-    const { payload } = await fetchJson(endpoint, {
-      method: "POST",
+  let cookie = "";
+
+  try {
+    const bootstrap = await fetch(boardUrl, {
+      method: "GET",
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "User-Agent": "Commercial-Launch-Radar/3.0",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
       },
-      body: JSON.stringify({
-        appliedFacets: {},
-        limit: pageSize,
-        offset,
-        searchText: "",
-      }),
+      redirect: "follow",
     });
 
-    const postings = Array.isArray(payload?.jobPostings) ? payload.jobPostings : [];
+    cookie = cookieHeaderFrom(bootstrap);
+  } catch {
+    // A board bootstrap is helpful for Workday session cookies but is not mandatory.
+  }
+
+  for (let offset = 0; offset < maxJobs; offset += pageSize) {
+    const payload = await fetchWorkdayPage({
+      endpoint,
+      origin,
+      referer: boardUrl,
+      cookie,
+      offset,
+      pageSize,
+    });
+
+    const postings = Array.isArray(payload?.jobPostings)
+      ? payload.jobPostings
+      : [];
 
     for (const job of postings) {
       const externalPath = String(job?.externalPath || "").trim();
       if (!externalPath) continue;
 
-      const path = externalPath.startsWith("/") ? externalPath : `/${externalPath}`;
+      const path = externalPath.startsWith("/")
+        ? externalPath
+        : `/${externalPath}`;
+
       const externalId = path.split("/").filter(Boolean).at(-1) || path;
       const jobUrl = `${origin}/${encodeURIComponent(locale)}/${encodeURIComponent(site)}${path}`;
 
@@ -292,7 +387,9 @@ export async function collectWorkday(input = {}) {
           description: "",
           payload: {
             postedOnRaw: job?.postedOn || null,
-            bulletFields: Array.isArray(job?.bulletFields) ? job.bulletFields : [],
+            bulletFields: Array.isArray(job?.bulletFields)
+              ? job.bulletFields
+              : [],
             workdayTenant: tenant,
             workdaySite: site,
             workdayLocale: locale,
@@ -303,6 +400,7 @@ export async function collectWorkday(input = {}) {
     }
 
     const total = Number(payload?.total || 0);
+
     if (
       !postings.length ||
       postings.length < pageSize ||
