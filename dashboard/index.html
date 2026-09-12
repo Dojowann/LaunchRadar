@@ -6,15 +6,15 @@
 <title>Commercial Launch Radar</title>
 <style>
 :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#181818;background:#f3f3f3;--navy:#032d60;--blue:#0176d3;--line:#d8dde6;--muted:#706e6b;--soft:#eef4ff;--green:#2e844a;--amber:#8c4b02;--red:#ba0517;--purple:#5a1ba9}
-*{box-sizing:border-box}body{margin:0}.top{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:10}.mark{width:38px;height:30px;border-radius:18px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}.brand{font-weight:800;color:var(--navy);font-size:18px}.pill{border-radius:999px;background:#eef4ff;color:var(--navy);padding:4px 8px;font-size:11px;font-weight:800}.app{padding:22px;max-width:1640px;margin:auto}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:14px}.eyebrow{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.03em}.hero h1{font-size:28px;color:var(--navy);margin:4px 0}.hero p{margin:0;color:var(--muted)}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--blue);border-radius:4px;background:#fff;color:var(--blue);padding:9px 13px;font-weight:800;cursor:pointer}.btn.primary{background:var(--blue);color:#fff}.btn:disabled{opacity:.55;cursor:wait}.notice{background:var(--soft);border:1px solid #aacbff;color:var(--navy);padding:11px 13px;border-radius:5px;margin-bottom:14px}.metrics{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px;margin-bottom:14px}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 3px #00000012}.card{padding:15px}.label{font-size:11px;color:var(--muted);font-weight:800}.value{font-size:28px;font-weight:850;color:var(--navy);margin-top:5px}.subvalue{font-size:11px;color:var(--muted);margin-top:2px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}.stack{display:grid;gap:14px}.head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}.head h2{font-size:16px;margin:0;color:var(--navy)}.body{padding:14px}.tablewrap{max-height:430px;overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{position:sticky;top:0;background:#fafaf9;text-align:left;color:#514f4d;font-size:11px;padding:9px;border-bottom:1px solid var(--line);z-index:1}td{padding:10px 9px;border-bottom:1px solid #ecebea;vertical-align:top}.company{font-weight:800;color:var(--navy)}.src{font-weight:800;color:var(--blue)}.muted{color:var(--muted);font-size:12px}.source{padding:9px 0;border-bottom:1px solid #ecebea}.source:last-child{border:0}.badge{display:inline-block;border-radius:999px;padding:3px 7px;background:#e5f2ff;color:var(--navy);font-size:10px;font-weight:800}.badge.gray{background:#f3f3f3;color:#514f4d}.badge.green{background:#e9f7ef;color:#1e6b3a}.badge.amber{background:#fff3e0;color:var(--amber)}.badge.red{background:#feded8;color:var(--red)}.badge.purple{background:#efe5ff;color:var(--purple)}.empty{padding:32px;text-align:center;color:var(--muted)}.healthrow{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #ecebea}.healthrow:last-child{border:0}.stage{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid #ecebea}.stage:last-child{border:0}.stageNum{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#eef4ff;color:var(--navy);font-weight:850;font-size:12px}.stageNum.live{background:#e9f7ef;color:var(--green)}.stage b{color:var(--navy);font-size:13px}.footnote{color:var(--muted);font-size:12px}.link{color:var(--blue);text-decoration:none}.link:hover{text-decoration:underline}.eventClaim{max-width:460px}.nowrap{white-space:nowrap}.score{font-size:20px;font-weight:850;color:var(--navy)}.scoreSmall{font-weight:800}.action{font-weight:850}.phase{font-weight:800;color:var(--navy)}
-@media(max-width:1500px){.metrics{grid-template-columns:repeat(4,1fr)}}@media(max-width:1050px){.layout{grid-template-columns:1fr}.hero{display:block}.actions{margin-top:14px}}@media(max-width:650px){.metrics{grid-template-columns:repeat(2,1fr)}.app{padding:14px}.actions{flex-wrap:wrap}}
+*{box-sizing:border-box}body{margin:0}.top{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:10}.mark{width:38px;height:30px;border-radius:18px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}.brand{font-weight:800;color:var(--navy);font-size:18px}.pill{border-radius:999px;background:#eef4ff;color:var(--navy);padding:4px 8px;font-size:11px;font-weight:800}.app{padding:22px;max-width:1640px;margin:auto}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:14px}.eyebrow{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.03em}.hero h1{font-size:28px;color:var(--navy);margin:4px 0}.hero p{margin:0;color:var(--muted)}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--blue);border-radius:4px;background:#fff;color:var(--blue);padding:9px 13px;font-weight:800;cursor:pointer}.btn.primary{background:var(--blue);color:#fff}.btn:disabled{opacity:.55;cursor:wait}.notice{background:var(--soft);border:1px solid #aacbff;color:var(--navy);padding:11px 13px;border-radius:5px;margin-bottom:14px}.metrics{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:12px;margin-bottom:14px}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 3px #00000012}.card{padding:15px}.label{font-size:11px;color:var(--muted);font-weight:800}.value{font-size:28px;font-weight:850;color:var(--navy);margin-top:5px}.subvalue{font-size:11px;color:var(--muted);margin-top:2px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}.stack{display:grid;gap:14px}.head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}.head h2{font-size:16px;margin:0;color:var(--navy)}.body{padding:14px}.tablewrap{max-height:430px;overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{position:sticky;top:0;background:#fafaf9;text-align:left;color:#514f4d;font-size:11px;padding:9px;border-bottom:1px solid var(--line);z-index:1}td{padding:10px 9px;border-bottom:1px solid #ecebea;vertical-align:top}.company{font-weight:800;color:var(--navy)}.src{font-weight:800;color:var(--blue)}.muted{color:var(--muted);font-size:12px}.source{padding:9px 0;border-bottom:1px solid #ecebea}.source:last-child{border:0}.badge{display:inline-block;border-radius:999px;padding:3px 7px;background:#e5f2ff;color:var(--navy);font-size:10px;font-weight:800}.badge.gray{background:#f3f3f3;color:#514f4d}.badge.green{background:#e9f7ef;color:#1e6b3a}.badge.amber{background:#fff3e0;color:var(--amber)}.badge.red{background:#feded8;color:var(--red)}.badge.purple{background:#efe5ff;color:var(--purple)}.empty{padding:32px;text-align:center;color:var(--muted)}.healthrow{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #ecebea}.healthrow:last-child{border:0}.stage{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid #ecebea}.stage:last-child{border:0}.stageNum{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#eef4ff;color:var(--navy);font-weight:850;font-size:12px}.stageNum.live{background:#e9f7ef;color:var(--green)}.stage b{color:var(--navy);font-size:13px}.footnote{color:var(--muted);font-size:12px}.link{color:var(--blue);text-decoration:none}.link:hover{text-decoration:underline}.eventClaim{max-width:460px}.nowrap{white-space:nowrap}.score{font-size:20px;font-weight:850;color:var(--navy)}.scoreSmall{font-weight:800}.action{font-weight:850}.phase{font-weight:800;color:var(--navy)}
+@media(max-width:1550px){.metrics{grid-template-columns:repeat(5,1fr)}}@media(max-width:1050px){.layout{grid-template-columns:1fr}.hero{display:block}.actions{margin-top:14px}}@media(max-width:650px){.metrics{grid-template-columns:repeat(2,1fr)}.app{padding:14px}.actions{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <div class="top"><div class="mark">LR</div><div class="brand">Commercial Launch Radar</div><span class="pill">v3 alpha</span></div>
 <main class="app">
 <section class="hero">
-  <div><div class="eyebrow">U.S. COMMERCIAL HIRING INTELLIGENCE</div><h1>Launch Radar</h1><p>Public-source evidence → canonical companies → commercial signals → deterministic recruiting opportunities.</p></div>
+  <div><div class="eyebrow">U.S. COMMERCIAL HIRING INTELLIGENCE</div><h1>Launch Radar</h1><p>Public-source evidence → hiring signals → deterministic recruiting opportunities.</p></div>
   <div class="actions"><button class="btn" onclick="loadAll()">Refresh</button><button class="btn primary" id="scanBtn" onclick="runMarketScan()">Scan Market</button></div>
 </section>
 <div class="notice" id="notice">Loading shared D1 intelligence…</div>
@@ -23,7 +23,8 @@
   <div class="card"><div class="label">WORKER</div><div class="value" id="health">—</div><div class="subvalue">shared backend</div></div>
   <div class="card"><div class="label">CANONICAL COMPANIES</div><div class="value" id="companiesN">—</div><div class="subvalue">resolved identities</div></div>
   <div class="card"><div class="label">REGULATORY EVENTS</div><div class="value" id="eventsN">—</div><div class="subvalue">FDA approval events</div></div>
-  <div class="card"><div class="label">COMMERCIAL SIGNALS</div><div class="value" id="commercialN">—</div><div class="subvalue">rights, org + hiring</div></div>
+  <div class="card"><div class="label">COMMERCIAL SIGNALS</div><div class="value" id="commercialN">—</div><div class="subvalue">rights + org evidence</div></div>
+  <div class="card"><div class="label">ACTIVE COMMERCIAL JOBS</div><div class="value" id="jobsN">—</div><div class="subvalue">ATS inventory</div></div>
   <div class="card"><div class="label">OPPORTUNITIES</div><div class="value" id="oppsN">—</div><div class="subvalue">asset-level scores</div></div>
   <div class="card"><div class="label">CONTACT NOW</div><div class="value" id="contactN">—</div><div class="subvalue">passes action gates</div></div>
   <div class="card"><div class="label">OBSERVATIONS</div><div class="value" id="obsN">—</div><div class="subvalue">raw source evidence</div></div>
@@ -33,8 +34,13 @@
 <section class="layout">
 <div class="stack">
   <div class="panel">
-    <div class="head"><h2>Recruiting opportunities</h2><span class="badge purple" id="scoringBadge">Scoring pending</span></div>
-    <div class="tablewrap"><table><thead><tr><th>Action</th><th>Company / asset</th><th>Hiring phase</th><th>Opportunity</th><th>Confidence</th><th>Coverage</th><th>Next expected signal</th></tr></thead><tbody id="opportunityRows"><tr><td colspan="7" class="empty">Opportunity scores will appear after the scoring Worker is deployed and Scan Market runs.</td></tr></tbody></table></div>
+    <div class="head"><h2>Recruiting opportunities</h2><span class="badge purple" id="scoringBadge">v3 alpha deterministic</span></div>
+    <div class="tablewrap"><table><thead><tr><th>Action</th><th>Company / asset</th><th>Hiring phase</th><th>Opportunity</th><th>Confidence</th><th>Coverage</th><th>Next expected signal</th></tr></thead><tbody id="opportunityRows"><tr><td colspan="7" class="empty">Loading opportunities…</td></tr></tbody></table></div>
+  </div>
+
+  <div class="panel">
+    <div class="head"><h2>Active field-commercial jobs</h2><span class="badge amber" id="jobsBadge">ATS pending</span></div>
+    <div class="tablewrap"><table><thead><tr><th>Company</th><th>Role</th><th>Family</th><th>Location</th><th>ATS</th><th>First seen</th></tr></thead><tbody id="jobRows"><tr><td colspan="6" class="empty">Hiring inventory will appear after ATS discovery and collection runs.</td></tr></tbody></table></div>
   </div>
 
   <div class="panel">
@@ -65,6 +71,7 @@
     <div class="healthrow"><span class="muted">Identity layer</span><b id="identityState">—</b></div>
     <div class="healthrow"><span class="muted">Regulatory events</span><b id="eventState">—</b></div>
     <div class="healthrow"><span class="muted">Commercial evidence</span><b id="commercialState">—</b></div>
+    <div class="healthrow"><span class="muted">ATS hiring inventory</span><b id="jobsState">—</b></div>
     <div class="healthrow"><span class="muted">Opportunity scoring</span><b id="scoringState">—</b></div>
     <div class="healthrow"><span class="muted">Raw evidence</span><b id="evidenceState">—</b></div>
   </div></div>
@@ -73,8 +80,9 @@
     <div class="stage"><div class="stageNum live">✓</div><div><b>Clinical source collection</b><div class="muted">ClinicalTrials.gov Phase III discovery is live.</div></div></div>
     <div class="stage"><div class="stageNum live">✓</div><div><b>Identity resolution</b><div class="muted">Canonical companies, assets and observation links are live.</div></div></div>
     <div class="stage"><div class="stageNum live">✓</div><div><b>FDA regulatory events</b><div class="muted">Original approvals become sourced FDA_APPROVED events.</div></div></div>
-    <div class="stage"><div class="stageNum live">✓</div><div><b>Commercial evidence</b><div class="muted">U.S. rights, launch intent, leadership and hiring research is live.</div></div></div>
-    <div class="stage"><div class="stageNum" id="scoringStageNum">5</div><div><b>Hiring phase + score</b><div class="muted" id="scoringStageText">Deterministic recruiting opportunity logic with evidence-confidence gates.</div></div></div>
+    <div class="stage"><div class="stageNum live">✓</div><div><b>Commercial evidence</b><div class="muted">U.S. rights, launch intent and commercial-org research is live.</div></div></div>
+    <div class="stage"><div class="stageNum" id="jobsStageNum">5</div><div><b>ATS hiring inventory</b><div class="muted" id="jobsStageText">Discover official Greenhouse, Lever and Ashby boards; collect active jobs deterministically.</div></div></div>
+    <div class="stage"><div class="stageNum live" id="scoringStageNum">✓</div><div><b>Hiring phase + score</b><div class="muted" id="scoringStageText">Deterministic recruiting opportunity logic with evidence-confidence gates.</div></div></div>
   </div></div>
 
   <div class="panel"><div class="head"><h2>Scoring model</h2></div><div class="body footnote">
@@ -85,7 +93,7 @@
 </aside>
 </section>
 
-<div class="footnote" style="margin-top:12px">Scores are v3 alpha and deterministic: the research layer finds and reconciles evidence; it does not assign the numerical recruiting score. Low source coverage deliberately suppresses CONTACT NOW.</div>
+<div class="footnote" style="margin-top:12px">ATS discovery may use research to find the correct official board, but the job inventory itself is collected directly from Greenhouse, Lever or Ashby. Job data then feeds the deterministic hiring score.</div>
 </main>
 
 <script>
@@ -94,153 +102,78 @@ const $=id=>document.getElementById(id);
 
 async function get(path){
   const r=await fetch(WORKER_BASE+path,{cache:'no-store'});
-  const text=await r.text();
-  let j;
-  try{j=JSON.parse(text)}catch{throw Error('Worker returned a non-JSON response')}
-  if(!r.ok)throw Error(j.error||('HTTP '+r.status));
-  return j
+  const text=await r.text();let j;try{j=JSON.parse(text)}catch{throw Error('Worker returned a non-JSON response')}if(!r.ok)throw Error(j.error||('HTTP '+r.status));return j
 }
-
 async function getSameOrigin(path,fallbackKey){
-  try{
-    const r=await fetch(path,{cache:'no-store'});
-    const text=await r.text();
-    let j;
-    try{j=JSON.parse(text)}catch{throw Error('Endpoint returned a non-JSON response')}
-    if(!r.ok)throw Error(j.error||('HTTP '+r.status));
-    return j
-  }catch(error){
-    console.error(path+' failed:',error);
-    return {[fallbackKey]:[],unavailable:true,error:error?.message||String(error)}
-  }
+  try{const r=await fetch(path,{cache:'no-store'});const text=await r.text();let j;try{j=JSON.parse(text)}catch{throw Error('Endpoint returned a non-JSON response')}if(!r.ok)throw Error(j.error||('HTTP '+r.status));return j}catch(error){console.error(path+' failed:',error);return {[fallbackKey]:[],unavailable:true,error:error?.message||String(error)}}
 }
-
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function prettyType(type){return String(type||'').replace(/_/g,' ').replace(/\b\w/g,m=>m.toUpperCase())}
 function eventTone(type){const negative=new Set(['US_RIGHTS_PARTNERED','CSO_SELECTED','LAUNCH_DELAYED','RESTRUCTURING','LAYOFF']);const hiring=new Set(['RBD_JOB_POSTED','SALES_MANAGER_JOB_POSTED','KAM_JOB_POSTED','FIELD_SALES_JOB_POSTED','VP_SALES_APPOINTED','NATIONAL_SALES_LEADER_APPOINTED']);if(negative.has(type))return 'red';if(hiring.has(type))return 'green';return ''}
 function actionTone(action){if(action==='CONTACT NOW')return 'green';if(action==='NEEDS VERIFICATION')return 'amber';if(action==='DEVELOP RELATIONSHIP')return 'purple';return 'gray'}
+function commercialJob(x){return ['field_sales','sales_leadership','market_access'].includes(x.role_family)}
 
 function renderCompanies(companies){
-  $('companiesN').textContent=companies.length;
-  $('identityState').textContent=companies.length?'Resolved':'Empty';
+  $('companiesN').textContent=companies.length;$('identityState').textContent=companies.length?'Resolved':'Empty';
   $('companyRows').innerHTML=companies.map(x=>{const assets=(x.assets||'').split(',').filter(Boolean);return `<tr><td><div class="company">${esc(x.canonical_name)}</div><div class="muted">${esc(x.normalized_name)}</div></td><td>${assets.length?esc(assets.join(', ')):'—'}<div class="muted">${Number(x.asset_count||0)} canonical asset${Number(x.asset_count||0)===1?'':'s'}</div></td><td><b>${esc(x.evidence_count||0)}</b> <span class="muted">resolved observation${Number(x.evidence_count||0)===1?'':'s'}</span></td><td>${esc(x.latest_source_date||'—')}</td><td><span class="badge green">Canonical</span></td></tr>`}).join('')||'<tr><td colspan="5" class="empty">No canonical companies yet.</td></tr>'
 }
-
 function renderOpportunities(opportunities,ready,unavailable){
-  $('oppsN').textContent=opportunities.length;
-  const contact=opportunities.filter(x=>x.recommended_action==='CONTACT NOW').length;
-  $('contactN').textContent=contact;
-  $('scoringState').textContent=unavailable?'Pending deploy':ready?(opportunities.length?'Live':'Ready'):'Pending deploy';
-  $('scoringBadge').textContent=unavailable||!ready?'Scoring pending':'v3 alpha deterministic';
-  $('scoringBadge').className='badge '+(unavailable||!ready?'amber':'purple');
-  if(ready&&!unavailable){$('scoringStageNum').textContent='✓';$('scoringStageNum').className='stageNum live';$('scoringStageText').textContent='Deterministic hiring phases, opportunity scores and evidence-confidence gates are live.'}
-  $('opportunityRows').innerHTML=opportunities.map(x=>`<tr><td><span class="badge ${actionTone(x.recommended_action)} action">${esc(x.recommended_action)}</span></td><td><div class="company">${esc(x.company_name||'—')}</div><div>${esc(x.asset_name||'—')}</div><div class="muted">${esc(x.rationale||'')}</div></td><td><div class="phase">Phase ${esc(x.hiring_phase)} — ${esc(x.hiring_phase_label)}</div></td><td><div class="score">${Math.round(Number(x.opportunity_score||0))}</div><div class="muted">/ 100</div></td><td><span class="scoreSmall">${Math.round(Number(x.evidence_confidence||0))}%</span></td><td><span class="scoreSmall">${Math.round(Number(x.source_coverage||0))}%</span></td><td>${esc(x.next_expected_hiring_event||'—')}<div class="muted">${esc(x.scoring_version||'')}</div></td></tr>`).join('')||(unavailable||!ready?'<tr><td colspan="7" class="empty">Deploy the scoring Worker update, then run Scan Market.</td></tr>':'<tr><td colspan="7" class="empty">No opportunities scored yet. Run Scan Market.</td></tr>')
+  $('oppsN').textContent=opportunities.length;const contact=opportunities.filter(x=>x.recommended_action==='CONTACT NOW').length;$('contactN').textContent=contact;
+  $('scoringState').textContent=unavailable?'Unavailable':ready?(opportunities.length?'Live':'Ready'):'Pending deploy';$('scoringBadge').textContent=unavailable||!ready?'Scoring pending':'v3 alpha deterministic';$('scoringBadge').className='badge '+(unavailable||!ready?'amber':'purple');
+  $('opportunityRows').innerHTML=opportunities.map(x=>`<tr><td><span class="badge ${actionTone(x.recommended_action)} action">${esc(x.recommended_action)}</span></td><td><div class="company">${esc(x.company_name||'—')}</div><div>${esc(x.asset_name||'—')}</div><div class="muted">${esc(x.rationale||'')}</div></td><td><div class="phase">Phase ${esc(x.hiring_phase)} — ${esc(x.hiring_phase_label)}</div></td><td><div class="score">${Math.round(Number(x.opportunity_score||0))}</div><div class="muted">/ 100</div></td><td><span class="scoreSmall">${Math.round(Number(x.evidence_confidence||0))}%</span></td><td><span class="scoreSmall">${Math.round(Number(x.source_coverage||0))}%</span></td><td>${esc(x.next_expected_hiring_event||'—')}<div class="muted">${esc(x.scoring_version||'')}</div></td></tr>`).join('')||(unavailable||!ready?'<tr><td colspan="7" class="empty">Opportunity endpoint is not available yet.</td></tr>':'<tr><td colspan="7" class="empty">No opportunities scored yet. Run Scan Market.</td></tr>')
 }
-
+function renderJobs(jobs,ready,unavailable){
+  const commercial=jobs.filter(commercialJob);$('jobsN').textContent=commercial.length;$('jobsState').textContent=unavailable?'Unavailable':ready?(commercial.length?'Live':'Ready'):'Pending deploy';$('jobsBadge').textContent=ready?'Greenhouse · Lever · Ashby':'ATS pending';$('jobsBadge').className='badge '+(ready?'green':'amber');
+  if(ready&&!unavailable){$('jobsStageNum').textContent='✓';$('jobsStageNum').className='stageNum live';$('jobsStageText').textContent='Official Greenhouse, Lever and Ashby boards are discovered, collected and normalized into active job inventory.'}
+  $('jobRows').innerHTML=commercial.map(x=>`<tr><td><div class="company">${esc(x.company_name||'—')}</div></td><td>${x.url?`<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title||'Job')}</a>`:esc(x.title||'Job')}</td><td><span class="badge green">${esc(prettyType(x.role_family))}</span></td><td>${esc(x.location||'—')}</td><td><span class="src">${esc(x.source_key)}</span></td><td class="nowrap">${esc((x.first_seen_at||'').slice(0,10)||'—')}</td></tr>`).join('')||(unavailable?'<tr><td colspan="6" class="empty">Job inventory is temporarily unavailable.</td></tr>':ready?'<tr><td colspan="6" class="empty">No active commercial jobs found yet. Run Scan Market to check the next company batch.</td></tr>':'<tr><td colspan="6" class="empty">Deploy the ATS hiring Worker update to activate this panel.</td></tr>')
+}
 function renderRegulatory(events,unavailable){
-  $('eventsN').textContent=events.length;
-  $('eventState').textContent=unavailable?'Unavailable':(events.length?'Live':'Ready');
-  $('eventBadge').textContent=unavailable?'Events unavailable':'FDA event layer';
-  $('eventBadge').className='badge '+(unavailable?'amber':'green');
+  $('eventsN').textContent=events.length;$('eventState').textContent=unavailable?'Unavailable':(events.length?'Live':'Ready');$('eventBadge').textContent=unavailable?'Events unavailable':'FDA event layer';$('eventBadge').className='badge '+(unavailable?'amber':'green');
   $('eventRows').innerHTML=events.map(x=>`<tr><td class="nowrap">${esc(x.event_date||'—')}</td><td><div class="company">${esc(x.company_name||'—')}</div></td><td>${esc(x.asset_name||'—')}</td><td><span class="badge green">${esc(x.event_type)}</span><div class="muted">${esc(x.value_text||'')}</div></td><td>${x.source_url?`<a class="link" href="${esc(x.source_url)}" target="_blank" rel="noopener">Primary FDA evidence</a>`:'—'}<div class="muted">confidence ${Math.round(Number(x.evidence_confidence||0)*100)}%</div></td></tr>`).join('')||(unavailable?'<tr><td colspan="5" class="empty">Events endpoint is temporarily unavailable.</td></tr>':'<tr><td colspan="5" class="empty">No FDA approval events collected yet.</td></tr>')
 }
-
 function renderCommercial(events,workerReady,eventsUnavailable){
-  $('commercialN').textContent=events.length;
-  $('commercialState').textContent=workerReady?(events.length?'Live':'Ready'):'Pending deploy';
-  $('commercialBadge').textContent=workerReady?'Commercial evidence layer':'Commercial research pending';
-  $('commercialBadge').className='badge '+(workerReady?'green':'amber');
+  $('commercialN').textContent=events.length;$('commercialState').textContent=workerReady?(events.length?'Live':'Ready'):'Pending deploy';$('commercialBadge').textContent=workerReady?'Commercial evidence layer':'Commercial research pending';$('commercialBadge').className='badge '+(workerReady?'green':'amber');
   $('commercialRows').innerHTML=events.map(x=>{const parsed=(()=>{try{return JSON.parse(x.value_json||'{}')}catch{return {}}})();const claim=parsed.claim||x.value_text||'';const tone=eventTone(x.event_type);return `<tr><td class="nowrap">${esc(x.event_date||'—')}</td><td><div class="company">${esc(x.company_name||'—')}</div></td><td>${esc(x.asset_name||'—')}</td><td><span class="badge ${tone}">${esc(prettyType(x.event_type))}</span><div class="muted eventClaim">${esc(claim)}</div></td><td>${x.source_url?`<a class="link" href="${esc(x.source_url)}" target="_blank" rel="noopener">Source evidence</a>`:'—'}<div class="muted">${Number(x.primary_source_count||0)} primary · ${Number(x.source_count||0)} source${Number(x.source_count||0)===1?'':'s'} · confidence ${Math.round(Number(x.evidence_confidence||0)*100)}%</div></td></tr>`}).join('')||(eventsUnavailable?'<tr><td colspan="5" class="empty">Event data is temporarily unavailable.</td></tr>':workerReady?'<tr><td colspan="5" class="empty">No supported commercial signals yet. Run Scan Market.</td></tr>':'<tr><td colspan="5" class="empty">Commercial research Worker is not deployed yet.</td></tr>')
 }
 
 async function loadAll(){
   try{
     $('notice').textContent='Loading shared D1 intelligence…';
-    const [h,s,c,e,p,o,r]=await Promise.all([
-      get('/health'),
-      get('/api/source-registry'),
-      get('/api/companies?limit=200'),
-      getSameOrigin('/api/events?limit=200','events'),
-      getSameOrigin('/api/opportunities?limit=200','opportunities'),
-      get('/api/observations?limit=200'),
-      get('/api/scan-runs?limit=30')
+    const [h,s,c,e,p,j,o,r]=await Promise.all([
+      get('/health'),get('/api/source-registry'),get('/api/companies?limit=200'),getSameOrigin('/api/events?limit=250','events'),getSameOrigin('/api/opportunities?limit=200','opportunities'),getSameOrigin('/api/jobs?status=active&limit=250','jobs'),get('/api/observations?limit=200'),get('/api/scan-runs?limit=30')
     ]);
-
-    const companies=c.companies||[];
-    const allEvents=e.events||[];
-    const regulatory=allEvents.filter(x=>x.event_type==='FDA_APPROVED');
-    const commercial=allEvents.filter(x=>x.event_type!=='FDA_APPROVED');
-    const opportunities=p.opportunities||[];
-    const observations=o.observations||[];
-    const commercialReady=Boolean(h?.endpoints?.researchCommercial)||String(h?.stage||'').includes('commercial')||String(h?.stage||'').includes('scoring');
-    const scoringReady=Boolean(h?.endpoints?.scoreOpportunities)||String(h?.stage||'').includes('scoring');
-
-    $('health').textContent=h.ok?'Online':'Error';
-    $('obsN').textContent=observations.length;
-    $('scansN').textContent=(r.scanRuns||[]).length;
-    $('d1State').textContent=h.d1_configured?'Connected':'Missing';
-    $('authState').textContent=h.scan_password_required?'Protected':'Open';
-    $('evidenceState').textContent=observations.length?'Collecting':'Empty';
+    const companies=c.companies||[];const allEvents=e.events||[];const regulatory=allEvents.filter(x=>x.event_type==='FDA_APPROVED');const commercial=allEvents.filter(x=>x.event_type!=='FDA_APPROVED');const opportunities=p.opportunities||[];const jobs=j.jobs||[];const observations=o.observations||[];
+    const commercialReady=Boolean(h?.endpoints?.researchCommercial);const hiringReady=Boolean(h?.endpoints?.scanHiring)&&Boolean(h?.endpoints?.jobs);const scoringReady=Boolean(h?.endpoints?.scoreOpportunities);
+    $('health').textContent=h.ok?'Online':'Error';$('obsN').textContent=observations.length;$('scansN').textContent=(r.scanRuns||[]).length;$('d1State').textContent=h.d1_configured?'Connected':'Missing';$('authState').textContent=h.scan_password_required?'Protected':'Open';$('evidenceState').textContent=observations.length?'Collecting':'Empty';
     $('sourceList').innerHTML=(s.sources||[]).map(x=>`<div class="source"><span class="badge">Tier ${esc(x.tier)}</span> <b>${esc(x.display_name||x.label)}</b><div class="muted">${esc(x.source_class||x.mode||'')}</div></div>`).join('')||'<div class="empty">No sources.</div>';
-
-    renderCompanies(companies);
-    renderOpportunities(opportunities,scoringReady,p.unavailable);
-    renderRegulatory(regulatory,e.unavailable);
-    renderCommercial(commercial,commercialReady,e.unavailable);
-
+    renderCompanies(companies);renderOpportunities(opportunities,scoringReady,p.unavailable);renderJobs(jobs,hiringReady,j.unavailable);renderRegulatory(regulatory,e.unavailable);renderCommercial(commercial,commercialReady,e.unavailable);
     $('rows').innerHTML=observations.map(x=>`<tr><td class="src">${esc(x.source_key)}</td><td>${esc(x.company_name_raw||'—')}</td><td>${esc(x.asset_name_raw||'—')}</td><td>${x.url?`<a class="link" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title||x.observation_type)}</a>`:esc(x.title||x.observation_type)}</td><td>${esc(x.published_at||'—')}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">D1 is connected; no observations have been collected yet.</td></tr>';
-
-    $('notice').textContent=`Connected to shared v3 D1. ${companies.length} canonical companies, ${regulatory.length} regulatory events, ${commercial.length} commercial signals, ${opportunities.length} scored opportunities.`;
-  }catch(e){
-    $('health').textContent='Error';
-    $('notice').textContent=e.message;
-  }
+    const commercialJobs=jobs.filter(commercialJob).length;
+    $('notice').textContent=`Connected to shared v3 D1. ${companies.length} canonical companies, ${regulatory.length} regulatory events, ${commercial.length} commercial signals, ${commercialJobs} active commercial jobs, ${opportunities.length} scored opportunities.`;
+  }catch(e){$('health').textContent='Error';$('notice').textContent=e.message}
 }
 
-async function scan(token,payload){
-  const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,...payload})});
-  const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Scan endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.error||j.detail||('HTTP '+r.status));return j
-}
-
-async function researchCommercial(token,batchSize=5){
-  const r=await fetch('/api/commercial-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,batchSize})});
-  const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Commercial research endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));return j
-}
-
-async function scoreOpportunities(token){
-  const r=await fetch('/api/score-opportunities',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,limit:500})});
-  const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Scoring endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));return j
-}
+async function scan(token,payload){const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,...payload})});const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Scan endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.error||j.detail||('HTTP '+r.status));return j}
+async function researchCommercial(token,batchSize=5){const r=await fetch('/api/commercial-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,batchSize})});const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Commercial research endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));return j}
+async function scanHiring(token,batchSize=5){const r=await fetch('/api/hiring-scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,batchSize})});const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Hiring scan endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));return j}
+async function scoreOpportunities(token){const r=await fetch('/api/score-opportunities',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({radarToken:token,limit:500})});const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Scoring endpoint returned HTTP '+r.status+' with a non-JSON response')}if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));return j}
 
 async function runMarketScan(){
-  const token=prompt('Enter your Scan Market password');
-  if(token===null)return;
-  if(!token){$('notice').textContent='A scan password is required.';return}
-
+  const token=prompt('Enter your Scan Market password');if(token===null)return;if(!token){$('notice').textContent='A scan password is required.';return}
   const btn=$('scanBtn');btn.disabled=true;btn.textContent='Scanning…';
   try{
-    $('notice').textContent='1/4 Collecting Phase III evidence from ClinicalTrials.gov…';
-    const clinical=await scan(token,{source:'clinicaltrials_gov',query:'AREA[Phase]PHASE3',pageSize:25});
-
-    $('notice').textContent='2/4 Collecting recent original NDA/BLA approvals from FDA…';
-    let fda=null,fdaError=null;try{fda=await scan(token,{source:'openfda_drugsfda',days:90,limit:50})}catch(e){fdaError=e.message}
-
-    $('notice').textContent='3/4 Researching U.S. rights, leadership and hiring signals…';
-    let commercial=null,commercialError=null;try{commercial=await researchCommercial(token,5)}catch(e){commercialError=e.message}
-
-    $('notice').textContent='4/4 Recalculating deterministic hiring phases and opportunity scores…';
-    let scored=null,scoreError=null;try{scored=await scoreOpportunities(token)}catch(e){scoreError=e.message}
-
-    const warnings=[fdaError?`FDA: ${fdaError}`:null,commercialError?`Commercial: ${commercialError}`:null,scoreError?`Scoring: ${scoreError}`:null].filter(Boolean);
-    const clinicalNew=clinical.inserted??0;const fdaNew=fda?.inserted??0;const commercialNew=commercial?.eventsInserted??0;const scoredN=scored?.scored??0;
-    $('notice').textContent=warnings.length
-      ?`Scan partially complete: ${clinicalNew} new clinical, ${fdaNew} new FDA, ${commercialNew} new commercial signals, ${scoredN} opportunities scored. ${warnings.join(' | ')}`
-      :`Scan complete: ${clinicalNew} new clinical observations, ${fdaNew} new FDA observations, ${commercialNew} new commercial signals, ${scoredN} opportunities scored. Reloading…`;
+    $('notice').textContent='1/5 Collecting Phase III evidence from ClinicalTrials.gov…';const clinical=await scan(token,{source:'clinicaltrials_gov',query:'AREA[Phase]PHASE3',pageSize:25});
+    $('notice').textContent='2/5 Collecting recent original NDA/BLA approvals from FDA…';let fda=null,fdaError=null;try{fda=await scan(token,{source:'openfda_drugsfda',days:90,limit:50})}catch(e){fdaError=e.message}
+    $('notice').textContent='3/5 Researching U.S. rights, leadership and commercial signals…';let commercial=null,commercialError=null;try{commercial=await researchCommercial(token,5)}catch(e){commercialError=e.message}
+    $('notice').textContent='4/5 Discovering official ATS boards and collecting active commercial jobs…';let hiring=null,hiringError=null;try{hiring=await scanHiring(token,5)}catch(e){hiringError=e.message}
+    $('notice').textContent='5/5 Recalculating deterministic hiring phases and opportunity scores…';let scored=null,scoreError=null;try{scored=await scoreOpportunities(token)}catch(e){scoreError=e.message}
+    const warnings=[fdaError?`FDA: ${fdaError}`:null,commercialError?`Commercial: ${commercialError}`:null,hiringError?`Hiring: ${hiringError}`:null,scoreError?`Scoring: ${scoreError}`:null].filter(Boolean);
+    const clinicalNew=clinical.inserted??0;const fdaNew=fda?.inserted??0;const commercialNew=commercial?.eventsInserted??0;const activeJobs=hiring?.activeCommercialJobs??0;const newJobs=hiring?.newCommercialJobs??0;const scoredN=scored?.scored??0;
+    $('notice').textContent=warnings.length?`Scan partially complete: ${clinicalNew} new clinical, ${fdaNew} new FDA, ${commercialNew} new commercial signals, ${activeJobs} active commercial jobs (${newJobs} newly seen), ${scoredN} opportunities scored. ${warnings.join(' | ')}`:`Scan complete: ${clinicalNew} new clinical observations, ${fdaNew} new FDA observations, ${commercialNew} new commercial signals, ${activeJobs} active commercial jobs (${newJobs} newly seen), ${scoredN} opportunities scored. Reloading…`;
     await loadAll();
   }catch(e){$('notice').textContent='Scan failed: '+e.message}
   finally{btn.disabled=false;btn.textContent='Scan Market'}
 }
-
 loadAll();
 </script>
 </body>
