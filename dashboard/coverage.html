@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Launch Radar — Hiring Source Coverage</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#181818;background:#f3f3f3;--navy:#032d60;--blue:#0176d3;--line:#d8dde6;--muted:#706e6b;--green:#2e844a;--amber:#8c4b02;--red:#ba0517}
+*{box-sizing:border-box}body{margin:0}.top{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:12px}.mark{width:38px;height:30px;border-radius:18px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}.brand{font-weight:800;color:var(--navy);font-size:18px}.app{max-width:1500px;margin:auto;padding:22px}.hero{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:14px}.hero h1{margin:3px 0;color:var(--navy);font-size:26px}.muted{color:var(--muted);font-size:12px}.btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:4px;padding:8px 12px;font-weight:800;cursor:pointer}.panel{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 3px #00000012}.summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:14px}.card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:14px}.label{font-size:11px;font-weight:800;color:var(--muted)}.value{font-size:27px;color:var(--navy);font-weight:850;margin-top:4px}.notice{margin-bottom:14px;padding:11px 13px;background:#eef4ff;border:1px solid #aacbff;color:var(--navy);border-radius:5px}.tablewrap{max-height:70vh;overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{position:sticky;top:0;background:#fafaf9;text-align:left;padding:9px;border-bottom:1px solid var(--line);color:#514f4d;font-size:11px}td{padding:10px 9px;border-bottom:1px solid #ecebea;vertical-align:top}.company{font-weight:800;color:var(--navy)}.badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800;margin:1px 3px 1px 0;background:#e5f2ff;color:var(--navy)}.badge.green{background:#e9f7ef;color:var(--green)}.badge.amber{background:#fff3e0;color:var(--amber)}.badge.red{background:#feded8;color:var(--red)}.badge.gray{background:#f3f3f3;color:#514f4d}.empty{text-align:center;color:var(--muted);padding:28px}.nowrap{white-space:nowrap}@media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}.hero{display:block}.hero .actions{margin-top:10px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="mark">LR</div><div class="brand">Commercial Launch Radar</div></div>
+<main class="app">
+  <section class="hero">
+    <div><div class="muted">HIRING SOURCE AUDIT</div><h1>Hiring-source coverage</h1><div class="muted">Verified official careers sources by company. Zero jobs only means something when source coverage is proven.</div></div>
+    <div class="actions"><button class="btn" onclick="location.href='/'">Dashboard</button> <button class="btn" onclick="loadCoverage()">Refresh</button></div>
+  </section>
+  <div class="notice" id="notice">Loading coverage…</div>
+  <section class="summary">
+    <div class="card"><div class="label">COMPANIES</div><div class="value" id="companiesN">—</div></div>
+    <div class="card"><div class="label">MULTI-SOURCE</div><div class="value" id="multiN">—</div></div>
+    <div class="card"><div class="label">SINGLE-SOURCE</div><div class="value" id="singleN">—</div></div>
+    <div class="card"><div class="label">NEEDS COVERAGE</div><div class="value" id="needsN">—</div></div>
+    <div class="card"><div class="label">ACTIVE U.S. COMMERCIAL JOBS</div><div class="value" id="jobsN">—</div></div>
+  </section>
+  <section class="panel">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Company</th><th>Coverage</th><th>Verified sources</th><th>Targets</th><th>Active U.S. commercial jobs</th><th>Last discovery</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function first(obj,...keys){for(const k of keys){if(obj&&obj[k]!==undefined&&obj[k]!==null)return obj[k]}return null}
+function statusOf(r){return String(first(r,'coverage_status','coverageStatus','status')||'').toLowerCase()}
+function sourcesOf(r){
+  const v=first(r,'verified_sources','verifiedSources','sources','source_keys','sourceKeys');
+  if(Array.isArray(v)) return v.map(x=>typeof x==='string'?x:(x?.source_key||x?.sourceKey||x?.name||'')).filter(Boolean);
+  if(typeof v==='string'){try{const p=JSON.parse(v);if(Array.isArray(p))return p.map(String)}catch{} return v.split(',').map(x=>x.trim()).filter(Boolean)}
+  return [];
+}
+function badgeStatus(status){
+  const s=String(status||'unknown');
+  const cls=s.includes('multi')?'green':s.includes('single')?'amber':(s.includes('need')||s.includes('none')||s.includes('uncheck'))?'red':'gray';
+  return `<span class="badge ${cls}">${esc(s.replaceAll('_',' '))}</span>`;
+}
+async function loadCoverage(){
+  $('notice').textContent='Loading hiring-source coverage…';
+  try{
+    const r=await fetch('/api/hiring-coverage?limit=500',{cache:'no-store'});
+    const raw=await r.text();let j;try{j=JSON.parse(raw)}catch{throw Error('Coverage endpoint returned a non-JSON response')}
+    if(!r.ok||j.ok===false)throw Error(j.detail||j.error||('HTTP '+r.status));
+    const rows=Array.isArray(j.coverage)?j.coverage:Array.isArray(j.rows)?j.rows:[];
+    let multi=0,single=0,needs=0,jobs=0;
+    for(const row of rows){const s=statusOf(row);if(s.includes('multi'))multi++;else if(s.includes('single'))single++;else needs++;jobs+=Number(first(row,'active_us_commercial_jobs','activeUsCommercialJobs','active_commercial_jobs','activeCommercialJobs')||0)}
+    $('companiesN').textContent=rows.length;$('multiN').textContent=multi;$('singleN').textContent=single;$('needsN').textContent=needs;$('jobsN').textContent=jobs;
+    $('rows').innerHTML=rows.length?rows.map(row=>{
+      const company=first(row,'company_name','companyName','canonical_name','canonicalName')||'Unknown';
+      const status=statusOf(row)||'unknown';
+      const sources=sourcesOf(row);
+      const targets=first(row,'target_count','targetCount','verified_target_count','verifiedTargetCount')||0;
+      const active=first(row,'active_us_commercial_jobs','activeUsCommercialJobs','active_commercial_jobs','activeCommercialJobs')||0;
+      const last=first(row,'last_discovery_at','lastDiscoveryAt','last_discovery','lastDiscovery','last_checked_at','lastCheckedAt');
+      return `<tr><td class="company">${esc(company)}</td><td>${badgeStatus(status)}</td><td>${sources.length?sources.map(s=>`<span class="badge">${esc(s)}</span>`).join(''):'<span class="muted">No verified source</span>'}</td><td>${esc(targets)}</td><td>${esc(active)}</td><td class="nowrap">${last?esc(String(last).slice(0,19).replace('T',' ')):'—'}</td></tr>`
+    }).join(''):'<tr><td colspan="6" class="empty">No coverage rows yet. Run Scan Market to populate the current discovery version.</td></tr>';
+    $('notice').textContent=`Coverage loaded for ${rows.length} companies${j.discoveryVersion?` · ${j.discoveryVersion}`:''}.`;
+  }catch(e){$('notice').textContent='Coverage load failed: '+e.message;$('rows').innerHTML='<tr><td colspan="6" class="empty">Could not load coverage.</td></tr>'}
+}
+loadCoverage();
+</script>
+</body>
+</html>
